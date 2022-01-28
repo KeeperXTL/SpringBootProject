@@ -13,13 +13,12 @@
             <input type="password" name="password" class="form-control" placeholder="Пароль"/><br>
             <input type="password" name="repeatPassword" class="form-control" placeholder="Повторите Пароль"/><br>
             <label>
-                <input type="checkbox" name="isCar" value="true"{{#isCar}}checked{{/isCar}}>
+                <input type="checkbox" name="is_car" value="true" {{#isCar}}checked{{/isCar}}>
                 Есть ли автомобиль?</label><br><br>
-            <p>Текущая роль: {{role}}</p>
-            <select name="role" required>
-                <option value="user">USER</option>
-                <option value="admin">ADMIN</option>
-                <option value="moder">MODER</option>
+            <select name="roles" required>
+                    {{#roles}}
+                        <option value="{{key.name}}" {{#value}}selected{{/value}}>{{key.name}}</option>
+                    {{/roles}}
             </select><br><br>
             <input type="hidden" name="_csrf" value="{{_csrf.token}}">
             <input type="submit" value="Обновить" class="btn btn-success"/>

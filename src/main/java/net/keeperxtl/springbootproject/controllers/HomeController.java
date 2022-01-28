@@ -124,34 +124,40 @@ public class HomeController {
     @GetMapping("/user")
     public String userPage(Principal principalUser, Map<String, Object> model) {
         User user = userRepository.findByUsername(principalUser.getName());
-        Role userRole = Role.ADMIN;
+        Role userRole = Role.USER;
         for(Role r: user.getRoles()) {
             userRole = r;
         }
         model.put("title", "Личный кабинет");
         model.put("isCar", user.isIs_car());
-        model.put("role", userRole.getName());
+        Map<Role, Boolean> roles = new HashMap<>();
+        for (Role r : Role.values()) {
+            if (r.equals(userRole)) {
+                roles.put(r, true);
+            }
+            else {
+                roles.put(r, false);
+            }
+        }
+        Set<Map.Entry<Role, Boolean>> rolesSet = roles.entrySet();
+        model.put("roles", rolesSet);
         model.put("user", user);
         return "user";
     }
     @PostMapping("/update-user")
-    public String addUser(@RequestParam String username,
-                          @RequestParam(required = false) String email,
+    public String addUser(User userForm,
                           @RequestParam(required = false) String repeatEmail,
-                          @RequestParam(required = false) String password,
                           @RequestParam(required = false) String repeatPassword,
-                          @RequestParam(required = false, defaultValue = "false") boolean isCar,
-                          @RequestParam String role,
                           Principal principalUser,
                           Map<String, Object> model) {
         User user = userRepository.findByUsername(principalUser.getName());
-        user.setUsername(username);
-        user.setIs_car(isCar);
-        user.setRoles(Collections.singleton(Role.fromString(role)));
-        if (!email.equals("") && email.equals(repeatEmail))
-            user.setEmail(email);
-        if (!password.equals("") && password.equals(repeatPassword))
-            user.setPassword(password);
+        user.setUsername(userForm.getUsername());
+        user.setIs_car(userForm.isIs_car());
+        user.setRoles(userForm.getRoles());
+        if (!userForm.getEmail().equals("") && userForm.getEmail().equals(repeatEmail))
+            user.setEmail(userForm.getEmail());
+        if (!userForm.getPassword().equals("") && userForm.getPassword().equals(repeatPassword))
+            user.setPassword(userForm.getPassword());
         userRepository.save(user);
         return "redirect:/user";
     }
