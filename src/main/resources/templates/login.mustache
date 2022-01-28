@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru">
+{{> head}}
+{{> header}}
+<body>
+<main>
+    <div class="container">
+        <h1>Авторизоваться</h1>
+        <form action="/login" method="post">
+            <input type="text" name="username" class="form-control" placeholder="Логин"/><br>
+            <input type="password" name="password" class="form-control" placeholder="Пароль"/><br>
+            <input type="hidden" name="_csrf" value="{{_csrf.token}}">
+            <input type="submit" value="Войти" class="btn btn-success"/>
+        </form>
+    </div>
+</main>
+</body>
+{{> footer}}
+</html>
