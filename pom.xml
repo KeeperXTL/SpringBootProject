@@ -18,7 +18,7 @@
     <description>Simple Spring Boot Project</description> <!-- project settings end -->
 
     <properties> <!-- project properties start -->
-        <java.version>11</java.version>
+        <java.version>1.8</java.version>
     </properties> <!-- project properties end -->
 
     <dependencies> <!-- project dependencies start -->
