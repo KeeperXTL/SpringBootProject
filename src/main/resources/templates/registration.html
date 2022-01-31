@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="ru">
-{{> head}}
-{{> header}}
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="blocks/head :: head"></head>
+<header th:replace="blocks/header :: header"></header>
 <body>
 <main>
     <div class="container">
         <h1>Зарегестрироваться</h1>
-        <form action="/registration" method="post">
+        <form th:action="@{/registration}" method="post">
             <input type="text" name="username" class="form-control" placeholder="Логин" required/><br>
             <input type="text" name="email" class="form-control" placeholder="Эл. почта" required/><br>
             <input type="text" name="repeatEmail" class="form-control" placeholder="Повторите Эл. почта" required/><br>
@@ -18,11 +18,10 @@
             <label>
             <input type="checkbox" required>
             Правила и условия</label><br><br>
-            <input type="hidden" name="_csrf" value="{{_csrf.token}}">
             <input type="submit" value="Зарегистрироваться" class="btn btn-success"/>
         </form>
     </div>
 </main>
 </body>
-{{> footer}}
+<footer th:replace="blocks/footer :: footer"></footer>
 </html>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="blocks/head :: head"></head>
+<header th:replace="blocks/header :: header"></header>
+<body>
+<div class="container mt-5">
+        <h2 class="mt-2" th:text="${review.title}"/>
+        <p th:text="${review.text}"/>
+        <form th:action="@{/reviews/} + ${review.id} + @{/delete}" method="post">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+        </form><br><br>
+        <p><b>Автор: </b><span th:text="${review.author.username}"/></p>
+        <a th:href="@{/reviews/} + ${review.id} + @{/update}" class="btn btn-warning">Редактировать</a>
+</div>
+</body>
+<footer th:replace="blocks/footer :: footer"></footer>
+</html>

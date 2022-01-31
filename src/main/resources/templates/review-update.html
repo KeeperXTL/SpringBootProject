@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="blocks/head :: head"></head>
+<header th:replace="blocks/header :: header"></header>
+<body>
+<div class="container mt-5">
+    <h1 th:text="'Редактирование записи «' + ${title} + '»'"/>
+    <form th:action="@{/reviews/} + ${review.id} + @{/update}" method="post">
+        <input type="text" name="title" placeholder="Название" class="form-control" th:value="${review.title}"><br>
+        <textarea name="text" placeholder="Текст" class="form-control" th:text="${review.text}"></textarea><br>
+        <button type="submit" class="btn btn-success">Обновить</button>
+    </form>
+</div>
+</body>
+<footer th:replace="blocks/footer :: footer"></footer>
+</html>

@@ -11,13 +11,30 @@ public class Review {
     private String title;
     @Lob
     private String text;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "author_id")
+    private User author;
 
     public Review() {
+    }
+
+    public Review(String title, String text, User author) {
+        this.title = title;
+        this.text = text;
+        this.author = author;
     }
 
     public Review(String title, String text) {
         this.title = title;
         this.text = text;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public Long getId() {

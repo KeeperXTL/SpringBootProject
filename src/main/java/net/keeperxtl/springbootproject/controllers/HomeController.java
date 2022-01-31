@@ -6,7 +6,9 @@ import net.keeperxtl.springbootproject.DB.models.User;
 import net.keeperxtl.springbootproject.DB.repository.ReviewRepository;
 import net.keeperxtl.springbootproject.DB.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,62 +27,62 @@ public class HomeController {
     private UserRepository userRepository;
 
     @GetMapping
-    public String homePage(@RequestParam(name = "username", required = false, defaultValue = "Anon") String username, Map<String, Object> model) {
-        model.put("title", "Главная страница");
-        model.put("name", username);
+    public String homePage(@RequestParam(name = "username", required = false, defaultValue = "Anon") String username, Model model) {
+        model.addAttribute("title", "Главная страница");
+        model.addAttribute("name", username);
         return "index";
     }
 
     @GetMapping("/about")
-    public String aboutPage(Map<String, Object> model) {
-        model.put("title", "Страница о нас");
+    public String aboutPage(Model model) {
+        model.addAttribute("title", "Страница о нас");
         return "about";
     }
 
     @GetMapping("/reviews")
-    public String reviewsPage(Map<String, Object> model) {
+    public String reviewsPage(Model model) {
         Iterable<Review> reviews = reviewRepository.findAll();
-        model.put("title", "Отзывы");
-        model.put("reviews", reviews);
+        model.addAttribute("title", "Отзывы");
+        model.addAttribute("reviews", reviews);
         return "reviews";
     }
 
     @PostMapping("/add-review")
-    public String addReviewPage(@RequestParam String title, @RequestParam String text ,Map<String, Object> model) {
-        Review review = new Review(title, text);
+    public String addReviewPage(@AuthenticationPrincipal User user, @RequestParam String title, @RequestParam String text) {
+        Review review = new Review(title, text, user);
         reviewRepository.save(review);
         return "redirect:/reviews";
     }
 
     @GetMapping("/reviews/{id}")
-    public String reviewPage(@PathVariable(value = "id") long id, Map<String, Object> model) throws ClassNotFoundException{
+    public String reviewPage(@PathVariable(value = "id") long id, Model model) throws ClassNotFoundException{
         Review review = reviewRepository.findById(id).orElseThrow(ClassNotFoundException::new);
 
-        model.put("title", review.getTitle());
-        model.put("review", review);
+        model.addAttribute("title", review.getTitle());
+        model.addAttribute("review", review);
 
         return "review";
     }
 
     @GetMapping("/reviews/{id}/update")
-    public String updateReviewPage(@PathVariable(value = "id") long id, Map<String, Object> model) throws ClassNotFoundException{
+    public String updateReviewPage(@PathVariable(value = "id") long id, Model model) throws ClassNotFoundException{
         Review review = reviewRepository.findById(id).orElseThrow(ClassNotFoundException::new);
 
-        model.put("title", review.getTitle());
-        model.put("review", review);
+        model.addAttribute("title", review.getTitle());
+        model.addAttribute("review", review);
 
         return "review-update";
     }
 
     @PostMapping("/reviews/{id}/update")
-    public String updateReview(@PathVariable(value = "id") long id, @RequestParam String title, @RequestParam String text ,Map<String, Object> model) throws ClassNotFoundException{
+    public String updateReview(@PathVariable(value = "id") long id, @RequestParam String title, @RequestParam String text , Model model) throws ClassNotFoundException{
         Review review = reviewRepository.findById(id).orElseThrow(ClassNotFoundException::new);
         review.setTitle(title);
         review.setText(text);
         reviewRepository.save(review);
 
-        model.put("title", review.getTitle());
-        model.put("review", review);
+        model.addAttribute("title", review.getTitle());
+        model.addAttribute("review", review);
 
         return "redirect:/reviews/" + id;
     }
@@ -94,15 +96,15 @@ public class HomeController {
     }
 
     @GetMapping("/login")
-    public String loginPage(Map<String, Object> model) {
-        model.put("title", "Авторизация");
+    public String loginPage(Model model) {
+        model.addAttribute("title", "Авторизация");
 
         return "login";
     }
 
     @GetMapping("/registration")
-    public String registrationPage(Map<String, Object> model) {
-        model.put("title", "Регистрация");
+    public String registrationPage(Model model) {
+        model.addAttribute("title", "Регистрация");
 
         return "registration";
     }
@@ -110,7 +112,7 @@ public class HomeController {
     @PostMapping("/registration")
     public String addUser(@RequestParam String username, @RequestParam String email,
                           @RequestParam String repeatEmail, @RequestParam String password,
-                          @RequestParam String repeatPassword, @RequestParam(required = false, defaultValue = "false") boolean isCar, User user, Map<String, Object> model) {
+                          @RequestParam String repeatPassword, @RequestParam(required = false, defaultValue = "false") boolean isCar, User user) {
         if (email.equals(repeatEmail) && password.equals(repeatPassword)) {
             user.setRoles(Collections.singleton(Role.USER));
             user.setEnabled(true);
@@ -122,14 +124,15 @@ public class HomeController {
         }
     }
     @GetMapping("/user")
-    public String userPage(Principal principalUser, Map<String, Object> model) {
-        User user = userRepository.findByUsername(principalUser.getName());
+    public String userPage(@AuthenticationPrincipal User principalUser, Model model) {
+        Optional<User> foundedUser = userRepository.findById(principalUser.getId());
+        User user = foundedUser.get();
         Role userRole = Role.USER;
         for(Role r: user.getRoles()) {
             userRole = r;
         }
-        model.put("title", "Личный кабинет");
-        model.put("isCar", user.isIs_car());
+        model.addAttribute("title", "Личный кабинет");
+        model.addAttribute("isCar", user.isIs_car());
         Map<Role, Boolean> roles = new HashMap<>();
         for (Role r : Role.values()) {
             if (r.equals(userRole)) {
@@ -140,17 +143,17 @@ public class HomeController {
             }
         }
         Set<Map.Entry<Role, Boolean>> rolesSet = roles.entrySet();
-        model.put("roles", rolesSet);
-        model.put("user", user);
+        model.addAttribute("roles", rolesSet);
+        model.addAttribute("user", user);
         return "user";
     }
     @PostMapping("/update-user")
     public String addUser(User userForm,
                           @RequestParam(required = false) String repeatEmail,
                           @RequestParam(required = false) String repeatPassword,
-                          Principal principalUser,
-                          Map<String, Object> model) {
-        User user = userRepository.findByUsername(principalUser.getName());
+                          @AuthenticationPrincipal User principalUser) {
+        Optional<User> foundedUser = userRepository.findById(principalUser.getId());
+        User user = foundedUser.get();
         user.setUsername(userForm.getUsername());
         user.setIs_car(userForm.isIs_car());
         user.setRoles(userForm.getRoles());

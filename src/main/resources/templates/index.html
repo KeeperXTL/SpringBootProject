@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="ru">
-{{> head}}
-{{> header}}
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="blocks/head :: head"></head>
+<header th:replace="blocks/header :: header"></header>
 <body>
 <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
     <h1 class="display-4 fw-normal">Pricing</h1>
@@ -119,5 +119,5 @@
     </div>
 </main>
 </body>
-{{> footer}}
+<footer th:replace="blocks/footer :: footer"></footer>
 </html>
