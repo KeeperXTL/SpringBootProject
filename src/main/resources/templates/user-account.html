@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="blocks/head :: head"></head>
+<header th:replace="blocks/header :: header"></header>
+<body>
+<main>
+    <div class="container">
+        <h1 th:text="${user.username}"></h1>
+        <form th:action="@{/update-user}" method="post">
+            <input type="text" name="username" class="form-control" placeholder="Логин" th:value="${user.username}" required/><br>
+            <input type="text" name="email" class="form-control" placeholder="Эл. почта" th:value="${user.email}"/><br>
+            <input type="text" name="repeatEmail" class="form-control" placeholder="Повторите Эл. почта"/><br>
+            <input type="password" name="password" class="form-control" placeholder="Пароль"/><br>
+            <input type="password" name="repeatPassword" class="form-control" placeholder="Повторите Пароль"/><br>
+            <label>
+                <input type="checkbox" name="is_car" value="true" th:if="${isCar}" checked>
+                <input type="checkbox" name="is_car" value="true" th:unless="${isCar}">
+                Есть ли автомобиль?</label><br><br>
+            <select name="roles" required>
+                <div  th:each="opt : ${roles}">
+                    <option th:value="${opt.key.name}" th:if="${opt.value}" selected th:text="${opt.key.name}"/>
+                    <option th:value="${opt.key.name}" th:unless="${opt.value}" th:text="${opt.key.name}"/>
+                </div>
+            </select><br><br>
+            <input type="submit" value="Обновить" class="btn btn-success"/>
+        </form>
+    </div>
+</main>
+</body>
+<footer th:replace="blocks/footer :: footer"></footer>
+</html>

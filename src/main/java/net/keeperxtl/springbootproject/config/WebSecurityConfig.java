@@ -1,5 +1,6 @@
 package net.keeperxtl.springbootproject.config;
 
+import net.keeperxtl.springbootproject.DB.models.Role;
 import net.keeperxtl.springbootproject.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +8,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -19,7 +22,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/", "/about", "/css/**", "/registration").permitAll()
+                    .antMatchers("/", "/about", "/css/**", "/registration").permitAll() //All users
+                    .antMatchers("/admin-panel/**").hasAnyAuthority(Role.ADMIN.name()) //Admin
                     .anyRequest().authenticated()
                 .and()
                     .formLogin()

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="blocks/head :: head"></head>
+<header th:replace="blocks/header :: header"></header>
+<body>
+    <div class="container border border-1 border-dark m-2 p-2" th:each="users : ${users}">
+        <h2 th:text="${users.username}"/><br>
+        <h3 th:if="${users.enabled}" class="text-success fw-bold">Активен</h3>
+        <h3 th:unless="${users.enabled}" class="text-danger fw-bold">Забанен</h3><br>
+        <a class="btn btn-warning" th:href="@{/admin-panel/user/} + ${users.username}">Детальнее</a>
+    </div>
+</body>
+<footer th:replace="blocks/footer :: footer"></footer>
+</html>

@@ -6,7 +6,10 @@ import net.keeperxtl.springbootproject.DB.models.User;
 import net.keeperxtl.springbootproject.DB.repository.ReviewRepository;
 import net.keeperxtl.springbootproject.DB.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.security.Principal;
 import java.util.*;
 
 @Controller
@@ -145,7 +147,7 @@ public class HomeController {
         Set<Map.Entry<Role, Boolean>> rolesSet = roles.entrySet();
         model.addAttribute("roles", rolesSet);
         model.addAttribute("user", user);
-        return "user";
+        return "user-account";
     }
     @PostMapping("/update-user")
     public String addUser(User userForm,
@@ -162,6 +164,51 @@ public class HomeController {
         if (!userForm.getPassword().equals("") && userForm.getPassword().equals(repeatPassword))
             user.setPassword(userForm.getPassword());
         userRepository.save(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         return "redirect:/user";
+    }
+
+    @GetMapping("/admin-panel")
+    public String adminPanelPage(Model model) {
+        List<User> users = userRepository.findAll();
+
+        model.addAttribute("title", "Панель администратора");
+        model.addAttribute("users", users);
+
+        return "admin-panel";
+    }
+
+    @GetMapping("/admin-panel/user/{username}")
+    public String userInfo(@PathVariable(value = "username") String username, Model model) {
+        User user = userRepository.findByUsername(username);
+
+        model.addAttribute("title", "Панель администратора");
+        model.addAttribute("user", user);
+
+        return "user";
+    }
+
+    @GetMapping("/admin-panel/user/{username}/ban")
+    public String banUser(@PathVariable(value = "username") String username, Model model) {
+        User user = userRepository.findByUsername(username);
+        user.setEnabled(false);
+        userRepository.save(user);
+
+        model.addAttribute("title", "Панель администратора");
+
+        return "redirect:/admin-panel";
+    }
+
+    @GetMapping("/admin-panel/user/{username}/unban")
+    public String unbanUser(@PathVariable(value = "username") String username, Model model) {
+        User user = userRepository.findByUsername(username);
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        model.addAttribute("title", "Панель администратора");
+
+        return "redirect:/admin-panel";
     }
 }

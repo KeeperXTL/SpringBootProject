@@ -3,29 +3,22 @@
 <head th:replace="blocks/head :: head"></head>
 <header th:replace="blocks/header :: header"></header>
 <body>
-<main>
-    <div class="container">
-        <h1 th:text="${user.username}"></h1>
-        <form th:action="@{/update-user}" method="post">
-            <input type="text" name="username" class="form-control" placeholder="Логин" th:value="${user.username}" required/><br>
-            <input type="text" name="email" class="form-control" placeholder="Эл. почта" th:value="${user.email}"/><br>
-            <input type="text" name="repeatEmail" class="form-control" placeholder="Повторите Эл. почта"/><br>
-            <input type="password" name="password" class="form-control" placeholder="Пароль"/><br>
-            <input type="password" name="repeatPassword" class="form-control" placeholder="Повторите Пароль"/><br>
-            <label>
-                <input type="checkbox" name="is_car" value="true" th:if="${isCar}" checked>
-                <input type="checkbox" name="is_car" value="true" th:unless="${isCar}">
-                Есть ли автомобиль?</label><br><br>
-            <select name="roles" required>
-                <div  th:each="opt : ${roles}">
-                    <option th:value="${opt.key.name}" th:if="${opt.value}" selected th:text="${opt.key.name}"/>
-                    <option th:value="${opt.key.name}" th:unless="${opt.value}" th:text="${opt.key.name}"/>
-                </div>
-            </select><br><br>
-            <input type="submit" value="Обновить" class="btn btn-success"/>
-        </form>
+<div class="container">
+    <h1 th:text="${user.username}"/><br>
+    <h2 th:text="${user.email}"/><br>
+    <h2 th:text="${user.roles.toArray()[0]}"/><br>
+    <h3 th:if="${user.enabled}" class="text-success fw-bold">Активен</h3>
+    <h3 th:unless="${user.enabled}" class="text-danger fw-bold">Забанен</h3><br>
+    <h3 th:if="${user.is_car}">Есть автомобиль</h3>
+    <h3 th:unless="${user.is_car}">Нету автомобиля</h3><br>
+    <a th:href="@{/admin-panel/user/} + ${user.username} + @{/ban}" class="btn btn-danger" th:if="${user.enabled}">Забанить</a><br>
+    <a th:href="@{/admin-panel/user/} + ${user.username} + @{/unban}" class="btn btn-success" th:unless="${user.enabled}">Разбанить</a><br>
+    <div th:each="review : ${user.reviews}" class="mt-5">
+        <h2 class="mt-2" th:text="${review.title}"/>
+        <p th:text="${review.text}"/>
+        <a th:href="@{/reviews/} + ${review.id}" class="btn btn-warning">Детальнее</a>
     </div>
-</main>
+</div>
 </body>
 <footer th:replace="blocks/footer :: footer"></footer>
 </html>
